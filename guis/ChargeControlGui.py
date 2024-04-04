@@ -1,6 +1,6 @@
 from datetime import datetime
 from ContextIf import ContextIf
-from GuiIf import GuiIf
+from guis.GuiIf import GuiIf
 from nicegui import ui
 
 from PythonLib.StringUtil import StringUtil
@@ -15,24 +15,44 @@ class ChargeControlGui(GuiIf):
         self.endTime = '00:00'
         self.startDate = '2023-01-01'
         self.endDate = '2023-01-01'
-        self.currentTime = ''
+        self.currentTime = None
         self.automaticMode = None
         self.mqttClient = None
         self.timeString = None
         self.endDateTime = None
         self.startDateTime = None
+        self.receivedStartDateTime = None
+        self.receivedEndDateTime = None
+        self.overallChargeControlState = None
 
     async def setup(self) -> None:
 
         self.mqttClient = await self.context.getMqttClient()
         await self.mqttClient.subscribeIndependentTopic('/house/agents/ChargeControl/data/OverallChargeControlState', self.__receivedOverallChargeControlState)
         await self.mqttClient.subscribeIndependentTopic('/house/agents/ChargeControl/data/TimeCharge/Time', self.__receivedCurrentTime)
+        await self.mqttClient.subscribeIndependentTopic('/house/agents/ChargeControl/data/TimeCharge/StartTime', self.__receivedStartDateTime)
+        await self.mqttClient.subscribeIndependentTopic('/house/agents/ChargeControl/data/TimeCharge/EndTime', self.__receivedEndDateTime)
 
         with ui.row().classes('w-full'):
             ui.label("Automatikbetrieb: ")
             ui.toggle({False: 'Aus', True: 'An'})\
                 .bind_value(self, 'automaticMode')\
                 .on("click", lambda e: self.automaticModeUpdate(e.sender.value))
+        with ui.row().classes('w-full'):
+            ui.label("Betriebsmodus: ")
+            ui.label().bind_text(self, 'overallChargeControlState')
+
+        with ui.row().classes('w-full'):
+            ui.label("Empfangene Zeiten: ")
+            with ui.row().classes('w-full'):
+                ui.label("Start: ")
+                ui.label().bind_text(self, 'receivedStartDateTime')
+            with ui.row().classes('w-full'):
+                ui.label("Jetzt: ")
+                ui.label().bind_text(self, 'currentTime')
+            with ui.row().classes('w-full'):
+                ui.label("Stop: ")
+                ui.label().bind_text(self, 'receivedEndDateTime')
 
         with ui.row().classes('w-full'):
             ui.label("Zeitgesteuertes Laden")
@@ -64,6 +84,16 @@ class ChargeControlGui(GuiIf):
 
     def __receivedOverallChargeControlState(self, payload: str) -> None:
         self.automaticMode = (False if payload == 'Manuel' else True)
+        self.overallChargeControlState = payload
 
     def __receivedCurrentTime(self, payload: str) -> None:
-        self.currentTime = payload
+        dateTimeObj = datetime.strptime(payload, INPUT_FORMAT)
+        self.currentTime = dateTimeObj.strftime("%d.%m.%Y %H:%M")
+
+    def __receivedStartDateTime(self, payload: str) -> None:
+        dateTimeObj = datetime.strptime(payload, INPUT_FORMAT)
+        self.receivedStartDateTime = dateTimeObj.strftime("%d.%m.%Y %H:%M")
+
+    def __receivedEndDateTime(self, payload: str) -> None:
+        dateTimeObj = datetime.strptime(payload, INPUT_FORMAT)
+        self.receivedEndDateTime = dateTimeObj.strftime("%d.%m.%Y %H:%M")

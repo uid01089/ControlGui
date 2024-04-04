@@ -1,6 +1,6 @@
 from nicegui import ui
 from ContextIf import ContextIf
-from GuiIf import GuiIf
+from guis.GuiIf import GuiIf
 
 
 class GarageGui(GuiIf):

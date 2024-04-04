@@ -1,13 +1,13 @@
 import paho.mqtt.client as pahoMqtt
-from ChargeControlGui import ChargeControlGui
+from guis.ChargeControlGui import ChargeControlGui
 from ContextIf import ContextIf
 
 
-from GarageGui import GarageGui
-from GardenGui import GardenGui
-from GuiIf import GuiIf
-from JalousienGui import JalousienGui
-from PvGui import PvGui
+from guis.GarageGui import GarageGui
+from guis.GardenGui import GardenGui
+from guis.GuiIf import GuiIf
+from guis.JalousienGui import JalousienGui
+from guis.PvGui import PvGui
 from PythonLib.AsyncMqtt import AsyncMqtt
 from PythonLib.AsyncScheduler import AsyncScheduler
 
@@ -15,7 +15,7 @@ from PythonLib.AsyncScheduler import AsyncScheduler
 class Context(ContextIf):
     def __init__(self) -> None:
         self.scheduler = AsyncScheduler()
-        self.mqttClient = AsyncMqtt("koserver.iot", "/house/agents/ControlGui", pahoMqtt.Client("ControlGui1", protocol=pahoMqtt.MQTTv311))
+        self.mqttClient = AsyncMqtt("koserver.iot", "/house/agents/ControlGui", pahoMqtt.Client("ControlGui2", protocol=pahoMqtt.MQTTv311))
         self.chargeControlGui = ChargeControlGui(self)
         self.garageGui = GarageGui(self)
         self.jalousienGui = JalousienGui(self)

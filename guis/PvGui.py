@@ -1,10 +1,10 @@
 from nicegui import ui
 from ContextIf import ContextIf
-from GuiIf import GuiIf
+from guis.GuiIf import GuiIf
 from PythonLib.StringUtil import StringUtil
 
 
-class GardenGui(GuiIf):
+class PvGui(GuiIf):
     def __init__(self, context: ContextIf):
         self.context = context
         self.mqttClient = None
@@ -15,12 +15,12 @@ class GardenGui(GuiIf):
 
         self.mqttClient = await self.context.getMqttClient()
 
-        # await self.mqttClient.subscribeIndependentTopic('/house/basement/ess/essinfo_common/BATT/soc', self.__receivedSoc)
-        # await self.mqttClient.subscribeIndependentTopic('/house/agents/Ess2Mqtt/data/winterstatus', self.__receivedWinterModus)
+        await self.mqttClient.subscribeIndependentTopic('/house/basement/ess/essinfo_common/BATT/soc', self.__receivedSoc)
+        await self.mqttClient.subscribeIndependentTopic('/house/agents/Ess2Mqtt/data/winterstatus', self.__receivedWinterModus)
 
         with ui.row().classes('w-full'):
             ui.label('SOC: ')
-            ui.label('').bind_text(self, 'soc')
+            ui.knob(0.0, show_value=True).bind_value(self, 'soc').disable()
 
         with ui.row().classes('w-full'):
             ui.label("Wintermodus: ")
@@ -32,13 +32,11 @@ class GardenGui(GuiIf):
         self.wintermodus = StringUtil.isBoolean(payload)
 
     def __receivedSoc(self, payload: str) -> None:
-        self.soc = payload
+        self.soc = float(payload) / 100
 
     async def mqttUpdate(self, value: bool) -> None:
         match (value):
             case True:
-                pass
-                # await self.mqttClient.publishIndependentTopic('/house/agents/Ess2Mqtt/control/setWinter[On,Off]', 'On')
+                await self.mqttClient.publishIndependentTopic('/house/agents/Ess2Mqtt/control/setWinter[On,Off]', 'On')
             case False:
-                pass
-                # await self.mqttClient.publishIndependentTopic('/house/agents/Ess2Mqtt/control/setWinter[On,Off]', 'Off')
+                await self.mqttClient.publishIndependentTopic('/house/agents/Ess2Mqtt/control/setWinter[On,Off]', 'Off')

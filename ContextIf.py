@@ -1,6 +1,6 @@
 
 from abc import ABC, abstractmethod
-from GuiIf import GuiIf
+from guis.GuiIf import GuiIf
 from PythonLib.AsyncMqtt import AsyncMqtt
 from PythonLib.AsyncScheduler import AsyncScheduler
 

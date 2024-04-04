@@ -7,7 +7,7 @@ from Context import Context
 from ContextIf import ContextIf
 
 
-from GuiIf import GuiIf
+from guis.GuiIf import GuiIf
 from PythonLib.DateUtil import DateTimeUtilities
 from PythonLib.JsonUtil import JsonUtil
 
@@ -60,7 +60,7 @@ class ControlGui(GuiIf):
 async def main() -> None:
     logging.basicConfig(level=logging.INFO)
     logging.getLogger('ControlGui').setLevel(logging.DEBUG)
-    logging.getLogger('PythonLib.Mqtt').setLevel(logging.DEBUG)
+    logging.getLogger('PythonLib.Mqtt').setLevel(logging.INFO)
 
     context = Context()
     await context.setup()

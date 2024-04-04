@@ -1,6 +1,6 @@
 from enum import Enum
 from ContextIf import ContextIf
-from GuiIf import GuiIf
+from guis.GuiIf import GuiIf
 from nicegui import ui
 
 
