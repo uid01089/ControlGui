@@ -24,6 +24,8 @@ class ChargeControlGui(GuiIf):
         self.receivedStartDateTime = None
         self.receivedEndDateTime = None
         self.overallChargeControlState = None
+        self.doChargingPVBased = None
+        self.isChargingTimeBased = None
 
     async def setup(self) -> None:
 
@@ -33,6 +35,9 @@ class ChargeControlGui(GuiIf):
         await self.mqttClient.subscribeIndependentTopic('/house/agents/ChargeControl/data/TimeCharge/StartTime', self.__receivedStartDateTime)
         await self.mqttClient.subscribeIndependentTopic('/house/agents/ChargeControl/data/TimeCharge/EndTime', self.__receivedEndDateTime)
 
+        await self.mqttClient.subscribeIndependentTopic('/house/agents/ChargeControl/data/PVSurPlusCharge/doCharging', self.__receivedDoChargingPVBased)
+        await self.mqttClient.subscribeIndependentTopic('/house/agents/ChargeControl/data/TimeCharge/isCharging', self.__receivedIsChargingTimeBased)
+
         with ui.row().classes('w-full'):
             ui.label("Automatikbetrieb: ")
             ui.toggle({False: 'Aus', True: 'An'})\
@@ -41,6 +46,12 @@ class ChargeControlGui(GuiIf):
         with ui.row().classes('w-full'):
             ui.label("Betriebsmodus: ")
             ui.label().bind_text(self, 'overallChargeControlState')
+
+        with ui.row().classes('w-full'):
+            ui.label("Aktives Laden [Timebased / PVbased]: ")
+            ui.label().bind_text(self, 'isChargingTimeBased')
+            ui.label(" / ")
+            ui.label().bind_text(self, 'doChargingPVBased')
 
         with ui.row().classes('w-full'):
             ui.label("Empfangene Zeiten: ")
@@ -97,3 +108,9 @@ class ChargeControlGui(GuiIf):
     def __receivedEndDateTime(self, payload: str) -> None:
         dateTimeObj = datetime.strptime(payload, INPUT_FORMAT)
         self.receivedEndDateTime = dateTimeObj.strftime("%d.%m.%Y %H:%M")
+
+    def __receivedDoChargingPVBased(self, payload: str) -> None:
+        self.doChargingPVBased = payload
+
+    def __receivedIsChargingTimeBased(self, payload: str) -> None:
+        self.isChargingTimeBased = payload
