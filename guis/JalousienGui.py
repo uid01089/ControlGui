@@ -24,12 +24,12 @@ class JalousienGui(GuiIf):
 
         with ui.row().classes('w-full'):
             ui.label("Wohnzimmer: ")
-            ui.toggle(options={JalousienState.OPEN: 'Rauf', JalousienState.STOP: 'STOP', JalousienState.CLOSE: 'Runter'},
+            ui.toggle(options={JalousienState.CLOSE: 'Rauf', JalousienState.STOP: 'STOP', JalousienState.OPEN: 'Runter'},
                       on_change=lambda e: self.mqttUpdate('Wohnzimmer', e.value)).bind_value(self, 'statusWohnzimmer')
 
         with ui.row().classes('w-full'):
             ui.label("Arbeitszimmer: ")
-            ui.toggle(options={JalousienState.OPEN: 'Rauf', JalousienState.STOP: 'STOP', JalousienState.CLOSE: 'Runter'},
+            ui.toggle(options={JalousienState.CLOSE: 'Rauf', JalousienState.STOP: 'STOP', JalousienState.OPEN: 'Runter'},
                       on_change=lambda e: self.mqttUpdate('Arbeitszimmer', e.value)).bind_value(self, 'statusArbeitszimmer')
 
     async def mqttUpdate(self, room: str, value: JalousienState) -> None:
