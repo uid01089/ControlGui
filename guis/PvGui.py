@@ -10,17 +10,21 @@ class PvGui(GuiIf):
         self.mqttClient = None
         self.wintermodus = None
         self.soc = None
+        self.pcsPvTotalPower = None
 
     async def setup(self) -> None:
 
         self.mqttClient = await self.context.getMqttClient()
 
         await self.mqttClient.subscribeIndependentTopic('/house/basement/ess/essinfo_common/BATT/soc', self.__receivedSoc)
+        await self.mqttClient.subscribeIndependentTopic('/house/basement/ess/essinfo_home/statistics/pcs_pv_total_power', self.__receivedPcsPvTotalPower)
         await self.mqttClient.subscribeIndependentTopic('/house/agents/Ess2Mqtt/data/winterstatus', self.__receivedWinterModus)
 
         with ui.row().classes('w-full'):
             ui.label('SOC: ')
             ui.knob(0.0, show_value=True).bind_value(self, 'soc').disable()
+            ui.label('Power [W]: ')
+            ui.label().bind_text(self, 'pcsPvTotalPower')
 
         with ui.row().classes('w-full'):
             ui.label("Wintermodus: ")
@@ -30,6 +34,9 @@ class PvGui(GuiIf):
 
     def __receivedWinterModus(self, payload: str) -> None:
         self.wintermodus = StringUtil.isBoolean(payload)
+
+    def __receivedPcsPvTotalPower(self, payload: str) -> None:
+        self.pcsPvTotalPower = int(payload)
 
     def __receivedSoc(self, payload: str) -> None:
         self.soc = float(payload) / 100

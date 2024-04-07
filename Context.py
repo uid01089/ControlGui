@@ -15,7 +15,7 @@ from PythonLib.AsyncScheduler import AsyncScheduler
 class Context(ContextIf):
     def __init__(self) -> None:
         self.scheduler = AsyncScheduler()
-        self.mqttClient = AsyncMqtt("koserver.iot", "/house/agents/ControlGui", pahoMqtt.Client("ControlGui3", protocol=pahoMqtt.MQTTv311))
+        self.mqttClient = AsyncMqtt("koserver.iot", "/house/agents/ControlGui", pahoMqtt.Client("ControlGui4", protocol=pahoMqtt.MQTTv311))
         self.chargeControlGui = ChargeControlGui(self)
         self.garageGui = GarageGui(self)
         self.jalousienGui = JalousienGui(self)
